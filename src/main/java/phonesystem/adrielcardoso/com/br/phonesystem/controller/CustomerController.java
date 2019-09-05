@@ -16,10 +16,10 @@ public class CustomerController
     CustomerService customerService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    Object findAll(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer size)
+    Object findAll(@RequestParam Integer page, @RequestParam Integer size)
     {
         try{
-            return new Response("", 200, this.customerService.findAll((page > 0 ? page : 0), (size > 0 ? size : 10)));
+            return new Response("", 200, this.customerService.findAll(page, size));
         }catch(Exception e){
             return new Response(e.getMessage(), 400);
         }
