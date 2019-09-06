@@ -10,8 +10,6 @@ import phonesystem.adrielcardoso.com.br.phonesystem.utils.Response;
 @RequestMapping("/api/v1/customer")
 public class CustomerController
 {
-    private
-
     @Autowired
     CustomerService customerService;
 
