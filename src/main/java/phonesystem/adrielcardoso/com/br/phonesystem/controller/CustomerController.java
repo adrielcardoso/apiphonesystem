@@ -13,6 +13,16 @@ public class CustomerController
     @Autowired
     CustomerService customerService;
 
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    Object findAllByAnything()
+    {
+        try{
+            return new Response("", 200, this.customerService.findAllByAnything());
+        }catch(Exception e){
+            return new Response(e.getMessage(), 400);
+        }
+    }
+
     @RequestMapping(value = "/ok", method = RequestMethod.GET)
     Object findAllByOk()
     {
@@ -38,6 +48,16 @@ public class CustomerController
     {
         try{
             return new Response("", 200, this.customerService.findAllByRegionOk(ddi));
+        }catch(Exception e){
+            return new Response(e.getMessage(), 400);
+        }
+    }
+
+    @RequestMapping(value = "/region/ddi/{ddi}", method = RequestMethod.GET)
+    Object findAllByRegion(@PathVariable Integer ddi)
+    {
+        try{
+            return new Response("", 200, this.customerService.findAllByRegion(ddi));
         }catch(Exception e){
             return new Response(e.getMessage(), 400);
         }

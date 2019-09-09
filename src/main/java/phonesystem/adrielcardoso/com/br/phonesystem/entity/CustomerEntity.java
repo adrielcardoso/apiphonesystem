@@ -19,6 +19,15 @@ public class CustomerEntity
     @Column(columnDefinition = "char(50)")
     private String phone;
 
+    @Transient
+    private String country;
+    @Transient
+    private Boolean state;
+    @Transient
+    private String countryCode;
+    @Transient
+    private String phoneNumber;
+
     public Integer getId() {
         return id;
     }
@@ -41,5 +50,37 @@ public class CustomerEntity
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public Boolean getState() {
+        return state;
+    }
+
+    public void setState(Boolean state) {
+        this.state = state;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

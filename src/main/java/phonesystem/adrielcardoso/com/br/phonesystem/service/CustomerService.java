@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.sqlite.Function;
 import phonesystem.adrielcardoso.com.br.phonesystem.PersistenceJPAConfig;
+import phonesystem.adrielcardoso.com.br.phonesystem.entity.CustomerEntity;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -15,6 +17,14 @@ public class CustomerService
 {
     @Autowired
     PersistenceJPAConfig persistenceJPAConfig;
+
+    public Object findAllByAnything() throws Exception {
+        return this.parseResultData(
+                this.getConnection().createStatement().executeQuery(
+                        "SELECT * FROM customer u"
+                )
+        );
+    }
 
     public Object findAllByOk() throws Exception {
         return this.parseResultData(
@@ -42,10 +52,18 @@ public class CustomerService
         );
     }
 
+    public Object findAllByRegion(Integer ddi) throws Exception {
+        return this.parseResultData(
+                this.getConnection().createStatement().executeQuery(
+                        "SELECT * FROM customer u where phone like '("+ddi+")%'"
+                )
+        );
+    }
+
     public Object findAllByRegionOk(Integer ddi) throws Exception {
         return this.parseResultData(
                 this.getConnection().createStatement().executeQuery(
-                        "SELECT * FROM customer u where phone REGEXP '^\\((["+ddi+"]{3})\\)' and \n" +
+                        "SELECT * FROM customer u where phone  like '("+ddi+")%' and \n" +
                                 "phone REGEXP '"+this.getRegexByRegion(ddi)+"'"
                 )
         );
@@ -54,7 +72,7 @@ public class CustomerService
     public Object findAllByRegionNOk(Integer ddi) throws Exception {
         return this.parseResultData(
                 this.getConnection().createStatement().executeQuery(
-                        "SELECT * FROM customer u where phone REGEXP '^\\((["+ddi+"]{3})\\)' and \n" +
+                        "SELECT * FROM customer u where phone  like '("+ddi+")%' and \n" +
                                 "phone not REGEXP '"+this.getRegexByRegion(ddi)+"'"
                 )
         );
@@ -80,18 +98,37 @@ public class CustomerService
         });
     }
 
-    private List<Object> parseResultData(ResultSet rs) throws Exception{
-        ResultSetMetaData resultSetMetaData = rs.getMetaData();
-        final int columnCount = resultSetMetaData.getColumnCount();
-        List<Object> result = new ArrayList<>();
+    private List<CustomerEntity> parseResultData(ResultSet rs) throws Exception{
+        List<CustomerEntity> result = new ArrayList<>();
         while (rs.next()) {
-            Object[] values = new Object[columnCount];
-            for (int i = 1; i <= columnCount; i++) {
-                values[i - 1] = rs.getObject(i);
-            }
-            result.add(values);
+            CustomerEntity temp = new CustomerEntity();
+            temp.setName(String.valueOf(rs.getObject(2)));
+            temp.setPhone(String.valueOf(rs.getObject(3)));
+            Integer ddi = this.getDDI(temp.getPhone());
+            temp.setCountryCode(String.valueOf(ddi));
+            temp.setState(this.stateNumberPhone(
+                    temp.getPhone(), this.getRegexByRegion(ddi)
+            ));
+            temp.setCountry(this.getCountryNameByDDI(ddi));
+            result.add(temp);
         }
         return result;
+    }
+
+    private Boolean stateNumberPhone(String phone, String regex) throws Exception{
+        return Pattern.matches(regex, phone);
+    }
+
+    private Integer getDDI(String phone) throws Exception{
+        final String regex = "^\\(([0-9]{3})\\)";
+        final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+        final Matcher matcher = pattern.matcher(
+                phone
+        );
+        while (matcher.find()) {
+            return Integer.valueOf(matcher.group(1));
+        }
+        throw new Exception("DDI not found");
     }
 
     private String getRegexByRegion(Integer ddi) throws Exception{
@@ -111,5 +148,24 @@ public class CustomerService
             return "\\(256\\)\\ ?\\d{9}$";
         }
         throw new Exception("Region not found");
+    }
+
+    private String getCountryNameByDDI(Integer ddi) throws Exception{
+        if(ddi == 237){
+            return "Cameroon";
+        }
+        if(ddi == 251){
+            return "Ethiopia";
+        }
+        if(ddi == 212){
+            return "Morocco";
+        }
+        if(ddi == 258){
+            return "Mozambique";
+        }
+        if(ddi == 256){
+            return "Uganda";
+        }
+        throw new Exception("Country not found");
     }
 }
