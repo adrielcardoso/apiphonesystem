@@ -13,11 +13,41 @@ public class CustomerController
     @Autowired
     CustomerService customerService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    Object findAll(@RequestParam Integer page, @RequestParam Integer size)
+    @RequestMapping(value = "/ok", method = RequestMethod.GET)
+    Object findAllByOk()
     {
         try{
-            return new Response("", 200, this.customerService.findAll(page, size));
+            return new Response("", 200, this.customerService.findAllByOk());
+        }catch(Exception e){
+            return new Response(e.getMessage(), 400);
+        }
+    }
+
+    @RequestMapping(value = "/nok", method = RequestMethod.GET)
+    Object findAllByNOk()
+    {
+        try{
+            return new Response("", 200, this.customerService.findAllByNOk());
+        }catch(Exception e){
+            return new Response(e.getMessage(), 400);
+        }
+    }
+
+    @RequestMapping(value = "/region/ddi/{ddi}/ok", method = RequestMethod.GET)
+    Object findAllByRegionOk(@PathVariable Integer ddi)
+    {
+        try{
+            return new Response("", 200, this.customerService.findAllByRegionOk(ddi));
+        }catch(Exception e){
+            return new Response(e.getMessage(), 400);
+        }
+    }
+
+    @RequestMapping(value = "/region/ddi/{ddi}/nok", method = RequestMethod.GET)
+    Object findAllByRegionNOk(@PathVariable Integer ddi)
+    {
+        try{
+            return new Response("", 200, this.customerService.findAllByRegionNOk(ddi));
         }catch(Exception e){
             return new Response(e.getMessage(), 400);
         }

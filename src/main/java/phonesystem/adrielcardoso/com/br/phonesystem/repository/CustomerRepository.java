@@ -7,12 +7,17 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import phonesystem.adrielcardoso.com.br.phonesystem.entity.CustomerEntity;
 
+import java.util.List;
+
 @Repository
 public interface CustomerRepository extends PagingAndSortingRepository<CustomerEntity, Long>
 {
-    @Query(
-            value = "SELECT * FROM customer u WHERE phone REGEXP '\\(237\\)\\ ?[2368]\\d{7,8}$'",
-            nativeQuery = true)
     Page<CustomerEntity> findAll(Pageable pageable);
+
+    @Query("select c from CustomerEntity c where c.phone like ?1")
+    Page<CustomerEntity> findAllByDDI(String phone, Pageable pageable);
+
+    @Query(value="SELECT * FROM customer u where phone not REGEXP 212", nativeQuery = true)
+    List<CustomerEntity> findAllByDDIRegex();
 }
 
